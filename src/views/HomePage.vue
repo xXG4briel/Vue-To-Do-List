@@ -81,7 +81,7 @@ export default defineComponent({
     addItem(){
 
       if (!this.tarefa) {
-        this.showMessage("Erro", "Adicione o nome da Tarefa!");
+        this.showMessage("Error", "Add a new task!");
         return;
       }
 
@@ -105,10 +105,10 @@ export default defineComponent({
         )
       );
 
-      this.showMessage("Sucesso", "Tarefa adicionada!");
+      this.showMessage("Sucess", "Task added!");
     },
     clearItens(){
-      this.showConfirm("Que deseja apagar todas as tarefas ?", ()=> {
+      this.showConfirm("who want to remove all tasks ?", ()=> {
         this.itens = [];
         this.tarefa = "";
         localStorage.removeItem("ToDo")
@@ -129,14 +129,14 @@ export default defineComponent({
     },
     async showMessage(header?: string, message?:string){
       const alert = await alertController.create({
-        header: header ?? 'Olá',
-        message: message ?? 'Wellcome to ToDo App :)',
+        header: header ?? 'Hi',
+        message: message ?? 'Welcome to ToDo App :)',
       });
       await alert.present();
     },
     async showConfirm(message: string, f: any){
       const confirm = await alertController.create({
-        header: 'Tem certeza ?',
+        header: 'Are you sure ?',
         message: message,
         buttons: [
           {
