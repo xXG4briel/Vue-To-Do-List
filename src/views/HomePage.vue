@@ -1,68 +1,155 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-title>Blank</ion-title>
+    <ion-header :translucent="true" class="ion-no-border">
+      <ion-toolbar color="dark">
+        <div class="header-title">
+          <ion-icon :icon="pencil"></ion-icon>
+          <ion-label class="ion-padding-start">List</ion-label>
+        </div>
       </ion-toolbar>
     </ion-header>
     
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
-        </ion-toolbar>
-      </ion-header>
-    
-      <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+      <div id="todo-container">
+        <ion-item class="ion-no-padding ion-padding-top ion-padding-horizontal">
+          <ion-item class="ion-no-padding todo-input-container" lines="none">
+            <ion-label position="stacked" color="dark">Task</ion-label>
+            <ion-input type="text" placeholder="Write a task" v-model="tarefa"></ion-input>
+          </ion-item>
+          <ion-button fill="solid" v-on:click="addItem()">
+            <ion-icon :icon="add"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <ion-list class="ion-padding-horizontal" v-if="itens.length > 0">
+          <ion-item v-for="(item, i) in itens" :key="i">
+            <ion-checkbox v-model="item.checked" slot="start"></ion-checkbox>
+            <ion-label>{{ item?.text }}</ion-label>
+          </ion-item>
+        </ion-list>
+  
+        <ion-item class="todo-delete-container ion-padding-top" lines="none">
+          <ion-button v-on:click="clearItens()" expand="block" fill="solid" size="default">
+            <ion-icon :icon="trash"></ion-icon>
+            <ion-label class="ion-padding-start">Limpar tarefas</ion-label>
+          </ion-button>
+        </ion-item>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { pencil, add, trash } from 'ionicons/icons';
+import { IonContent, IonPage, alertController, IonButton,IonHeader, IonInput, IonToolbar, IonItem, IonLabel, IonCheckbox, IonList, IonIcon } from '@ionic/vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'HomePage',
   components: {
     IonContent,
-    IonHeader,
     IonPage,
-    IonTitle,
-    IonToolbar
+    IonCheckbox,
+    IonItem,
+    IonLabel,
+    IonButton,
+    IonInput,
+    IonList,
+    IonHeader,
+    IonToolbar,
+    IonIcon
+  },
+  created(){
+    const itens = localStorage.getItem("ToDo");
+    if(itens) {
+      this.itens = JSON.parse(itens);
+    }
+
+  },
+  setup() {
+    return {
+      pencil, add, trash
+    }
+  },
+  data() {
+      const itens: any = [];
+      return {
+        itens: itens,
+        tarefa: "",
+      }
+    },
+  methods: {
+    addItem(){
+
+      console.log(this.tarefa)
+
+      if (!this.tarefa) {
+        this.showMessage("Erro", "Adicione o nome da Tarefa!");
+        return;
+      }
+
+      const toDo: any = localStorage.getItem("ToDo");
+      const toDoItens = JSON.parse(toDo)
+      const id = toDoItens ? toDoItens.length : 0;
+
+      const item = { 
+        id: id,
+        text: this.tarefa,
+        checked: false
+      };
+      this.itens.push(item);
+      this.tarefa = "";
+
+      localStorage.setItem("ToDo", JSON.stringify (
+        toDo ? // Se tiver item no localStorage adiciona mais
+        // senão adiciona só um
+        [...toDoItens, item]:
+        [item]
+        )
+      );
+
+      this.showMessage("Sucesso", "Tarefa adicionada!");
+    },
+    clearItens(){
+      this.showConfirm("Que deseja apagar todas as tarefas ?", ()=> {
+        this.itens = [];
+        this.tarefa = "";
+        localStorage.removeItem("ToDo")
+      });
+    },
+    async showMessage(header?: string, message?:string){
+      const alert = await alertController.create({
+        header: header ?? 'Olá',
+        message: message ?? 'Wellcome to ToDo App :)',
+      });
+      await alert.present();
+    },
+    async showConfirm(message: string, f: any){
+      const confirm = await alertController.create({
+        header: 'Tem certeza ?',
+        message: message,
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+              var t = 0;
+            },
+          },
+          {
+              text: 'OK',
+              role: 'confirm',
+              handler: f
+          },
+        ]
+      })
+      await confirm.present();
+    }
   }
 });
+
 </script>
 
-<style scoped>
-#container {
-  text-align: center;
-  
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  
-  color: #8c8c8c;
-  
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
-}
+<style scoped lang="scss" src="./HomePage.scss">
+  /* npm install -D sass-loader sass */
+  /* lang="scss" */
 </style>

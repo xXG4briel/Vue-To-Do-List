@@ -1,0 +1,29 @@
+ion-header{
+    ion-toolbar {
+        .header-title {
+            display: flex;
+            justify-content: center;
+            font-size: 24px;
+        }
+    }
+}
+ion-content{
+    #todo-container{
+        max-width: 480px;
+        min-width: 250px;
+        margin: 0 auto;
+        // display: flex;
+        // justify-content: center;
+        ion-item{
+            .todo-input-container {
+                display: flex;
+                flex: 1;
+            }
+        }
+        .todo-delete-container {
+            ion-button {
+                margin: 0 auto;
+            }
+        }
+    }
+}
