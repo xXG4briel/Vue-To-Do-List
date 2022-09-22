@@ -4,7 +4,7 @@
       <ion-toolbar color="dark">
         <div class="header-title">
           <ion-icon :icon="pencil"></ion-icon>
-          <ion-label class="ion-padding-start">List</ion-label>
+          <ion-label class="ion-padding-start">To Do List</ion-label>
         </div>
       </ion-toolbar>
     </ion-header>
@@ -14,14 +14,14 @@
         <ion-item class="ion-no-padding ion-padding-top ion-padding-horizontal">
           <ion-item class="ion-no-padding todo-input-container" lines="none">
             <ion-label position="stacked" color="dark">Task</ion-label>
-            <ion-input type="text" placeholder="Write a task" v-model="tarefa"></ion-input>
+            <ion-input type="text" placeholder="Write a task" v-model="tarefa" v-on:keyup.enter="addItem()"></ion-input>
           </ion-item>
           <ion-button fill="solid" v-on:click="addItem()">
             <ion-icon :icon="add"></ion-icon>
           </ion-button>
         </ion-item>
         <ion-list class="ion-padding-horizontal" v-if="itens.length > 0">
-          <ion-item v-for="(item, i) in itens" :key="i">
+          <ion-item v-for="(item, i) in itens" :key="i" v-on:click="setTask(item)">
             <ion-checkbox v-model="item.checked" slot="start"></ion-checkbox>
             <ion-label>{{ item?.text }}</ion-label>
           </ion-item>
@@ -30,7 +30,7 @@
         <ion-item class="todo-delete-container ion-padding-top" lines="none">
           <ion-button v-on:click="clearItens()" expand="block" fill="solid" size="default">
             <ion-icon :icon="trash"></ion-icon>
-            <ion-label class="ion-padding-start">Limpar tarefas</ion-label>
+            <ion-label class="ion-padding-start">Delete tasks</ion-label>
           </ion-button>
         </ion-item>
       </div>
@@ -80,8 +80,6 @@ export default defineComponent({
   methods: {
     addItem(){
 
-      console.log(this.tarefa)
-
       if (!this.tarefa) {
         this.showMessage("Erro", "Adicione o nome da Tarefa!");
         return;
@@ -115,6 +113,19 @@ export default defineComponent({
         this.tarefa = "";
         localStorage.removeItem("ToDo")
       });
+    },
+    setTask(task: any){
+      const toDo: any = localStorage.getItem("ToDo");
+      const toDoItens = JSON.parse(toDo);
+      
+      toDoItens.map(( item: any ) => {
+        if (item.id == task.id) {
+          item.checked = task.checked;
+        }
+      });
+
+      localStorage.setItem("ToDo", JSON.stringify(toDoItens));
+
     },
     async showMessage(header?: string, message?:string){
       const alert = await alertController.create({
